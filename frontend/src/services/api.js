@@ -45,4 +45,16 @@ export const startAttendance = async (employeeIds) => {
   return response.data;
 };
 
+export const createEmployee = async (employee) => {
+  const response = await api.post("/employees", employee);
+
+  return response.data;
+};
+
+export const createLocation = async (location) => {
+  const response = await api.post("/locations", location);
+
+  return response.data;
+};
+
 export default api;

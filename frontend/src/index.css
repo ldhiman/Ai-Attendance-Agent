@@ -727,3 +727,131 @@ code {
     flex-wrap: wrap;
   }
 }
+
+.heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.modal {
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  padding: 20px 22px;
+  border-bottom: 1px solid #edf0f4;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  font-size: 18px;
+}
+
+.modal-header p {
+  color: #8a93a3;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  color: #667085;
+  padding: 4px;
+}
+
+.modal form {
+  padding: 22px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #344054;
+}
+
+.form-group input,
+.form-group select {
+  height: 40px;
+  padding: 0 11px;
+  border: 1px solid #dce1e9;
+  border-radius: 7px;
+  outline: none;
+  color: #344054;
+  background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px #eef0ff;
+}
+
+.form-error {
+  margin: 16px 22px 0;
+  padding: 11px 13px;
+  border-radius: 7px;
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  color: #b42318;
+  font-size: 12px;
+}
+
+.modal-actions {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #edf0f4;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group.full-width {
+    grid-column: auto;
+  }
+
+  .heading-actions {
+    flex-wrap: wrap;
+  }
+}
