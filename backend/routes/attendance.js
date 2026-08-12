@@ -432,4 +432,115 @@ router.post("/start", async (req, res) => {
   }
 });
 
+// ==========================================
+// GENERATE TODAY'S ATTENDANCE
+// ==========================================
+//
+// POST /api/attendance/generate
+//
+// Creates one PENDING attendance record
+// for every active employee who doesn't
+// already have one for today.
+// ==========================================
+
+router.post("/generate", async (req, res) => {
+  try {
+    // Use YYYY-MM-DD because Attendance.date
+    // is stored as a String.
+    const today = new Date().toISOString().split("T")[0];
+
+    const employees = await Employee.find({
+      active: true,
+    }).populate("locationId", "locationId name city state timezone");
+
+    if (employees.length === 0) {
+      return res.json({
+        success: true,
+        message: "No active employees found",
+        date: today,
+        totalEmployees: 0,
+        created: 0,
+        existing: 0,
+        total: 0,
+      });
+    }
+
+    let created = 0;
+    let existing = 0;
+
+    const attendanceRecords = [];
+
+    for (const employee of employees) {
+      // Check if today's attendance already exists
+      const existingAttendance = await Attendance.findOne({
+        employeeId: employee._id,
+        date: today,
+      });
+
+      if (existingAttendance) {
+        existing++;
+        continue;
+      }
+
+      const attendance = await Attendance.create({
+        employeeId: employee._id,
+
+        locationId: employee.locationId?._id || employee.locationId,
+
+        date: today,
+
+        status: "PENDING",
+
+        source: "VOICE_AI",
+
+        verification: "NOT_VERIFIED",
+
+        employeeVerified: false,
+
+        locationVerified: false,
+
+        hunarCallId: "",
+
+        transcript: "",
+
+        summary: "",
+
+        reason: "",
+      });
+
+      attendanceRecords.push(attendance);
+
+      created++;
+    }
+
+    return res.status(201).json({
+      success: true,
+
+      message: "Today's attendance generated successfully",
+
+      date: today,
+
+      totalEmployees: employees.length,
+
+      created,
+
+      existing,
+
+      total: created + existing,
+
+      attendance: attendanceRecords,
+    });
+  } catch (error) {
+    console.error("Generate attendance error:", error);
+
+    return res.status(500).json({
+      success: false,
+
+      message: "Failed to generate today's attendance",
+
+      error: error.message,
+    });
+  }
+});
+
 module.exports = router;

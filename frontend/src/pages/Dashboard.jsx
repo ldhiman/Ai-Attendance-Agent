@@ -5,11 +5,16 @@ import {
   XCircle,
   AlertTriangle,
   RefreshCw,
+  CalendarPlus,
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
 
-import { getDashboardSummary, getAttendance } from "../services/api";
+import {
+  getDashboardSummary,
+  getAttendance,
+  generateAttendance,
+} from "../services/api";
 
 import StatCard from "../components/StatCard";
 
@@ -17,8 +22,34 @@ const Dashboard = () => {
   const [summary, setSummary] = useState(null);
 
   const [recentAttendance, setRecentAttendance] = useState([]);
+  const [generating, setGenerating] = useState(false);
+
+  const [generateMessage, setGenerateMessage] = useState("");
 
   const [loading, setLoading] = useState(true);
+
+  const handleGenerateAttendance = async () => {
+    try {
+      setGenerating(true);
+      setGenerateMessage("");
+
+      const result = await generateAttendance();
+
+      setGenerateMessage(
+        `${result.created} attendance records created. ${result.existing} already existed.`,
+      );
+
+      await loadDashboard();
+    } catch (error) {
+      console.error("Generate attendance error:", error);
+
+      setGenerateMessage(
+        error.response?.data?.message || "Failed to generate attendance.",
+      );
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const loadDashboard = async () => {
     try {
@@ -70,11 +101,31 @@ const Dashboard = () => {
           <p>Real-time attendance across all locations</p>
         </div>
 
-        <button className="secondary-btn" onClick={loadDashboard}>
-          <RefreshCw size={17} />
-          Refresh
-        </button>
+        <div className="heading-actions">
+          <button
+            className="secondary-btn"
+            onClick={loadDashboard}
+            disabled={loading}
+          >
+            <RefreshCw size={17} />
+            Refresh
+          </button>
+
+          <button
+            className="primary-btn"
+            onClick={handleGenerateAttendance}
+            disabled={generating}
+          >
+            <CalendarPlus size={17} />
+
+            {generating ? "Generating..." : "Generate Today's Attendance"}
+          </button>
+        </div>
       </div>
+
+      {generateMessage && (
+        <div className="action-message">{generateMessage}</div>
+      )}
 
       <div className="stats-grid">
         <StatCard

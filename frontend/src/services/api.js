@@ -57,4 +57,10 @@ export const createLocation = async (location) => {
   return response.data;
 };
 
+export const generateAttendance = async () => {
+  const response = await api.post("/attendance/generate");
+
+  return response.data;
+};
+
 export default api;
