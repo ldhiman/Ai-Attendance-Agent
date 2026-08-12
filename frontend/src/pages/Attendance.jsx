@@ -4,16 +4,24 @@ import {
   PhoneCall,
   RefreshCw,
   Loader2,
+  CalendarPlus,
 } from "lucide-react";
-
 import { useEffect, useState } from "react";
 
-import { getAttendance, startAttendance } from "../services/api";
+import {
+  getAttendance,
+  startAttendance,
+  generateAttendance,
+} from "../services/api";
 
 const Attendance = () => {
   const [attendance, setAttendance] = useState([]);
 
   const [status, setStatus] = useState("");
+
+  const [generating, setGenerating] = useState(false);
+
+  const [generateMessage, setGenerateMessage] = useState("");
 
   const [selected, setSelected] = useState([]);
 
@@ -22,6 +30,30 @@ const Attendance = () => {
   const [starting, setStarting] = useState(false);
 
   const [message, setMessage] = useState("");
+
+  const handleGenerateAttendance = async () => {
+    try {
+      setGenerating(true);
+      setGenerateMessage("");
+
+      const result = await generateAttendance();
+
+      setGenerateMessage(
+        `${result.created} attendance records created. ${result.existing} already existed.`,
+      );
+
+      await loadAttendance();
+    } catch (error) {
+      console.error("Generate attendance error:", error);
+
+      setGenerateMessage(
+        error.response?.data?.message ||
+          "Failed to generate today's attendance.",
+      );
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const loadAttendance = async () => {
     try {
@@ -133,15 +165,39 @@ const Attendance = () => {
           <p>Manage today's attendance and AI verification</p>
         </div>
 
-        <button
-          className="secondary-btn"
-          onClick={loadAttendance}
-          disabled={loading}
-        >
-          <RefreshCw size={17} />
-          Refresh
-        </button>
+        <div className="heading-actions">
+          <button
+            className="secondary-btn"
+            onClick={loadAttendance}
+            disabled={loading}
+          >
+            <RefreshCw size={17} />
+            Refresh
+          </button>
+
+          <button
+            className="primary-btn"
+            onClick={handleGenerateAttendance}
+            disabled={generating}
+          >
+            {generating ? (
+              <>
+                <Loader2 size={17} className="spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <CalendarPlus size={17} />
+                Generate Today's Attendance
+              </>
+            )}
+          </button>
+        </div>
       </div>
+
+      {generateMessage && (
+        <div className="action-message">{generateMessage}</div>
+      )}
 
       {/* ======================================
           ACTION BAR
